@@ -21,7 +21,7 @@ namespace KinExplorerCreateAccount.Controllers
         {
             _logger = loggerFactory.CreateLogger<CreateController>();
             _keyPair = KeyPair.FromSecretSeed(config["Secret_Seed"]);
-            _app_id = config["App_Id"];
+            _app_id = config["App_Id"] ?? "kin_explorer";
             _server = server;
 
         }
