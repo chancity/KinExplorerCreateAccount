@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Net;
+using System.Net.Http;
+using Kin.Stellar.Sdk;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace KinExplorerCreateAccount
 {
@@ -21,11 +18,39 @@ namespace KinExplorerCreateAccount
         }
 
         public IConfiguration Configuration { get; }
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            if (bool.TryParse(Configuration["Swagger_Enabled"], out var ret) && ret)
+            {
+                services.AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new Info {Title = "KinExplorer Create Account API", Version = "v1"});
+                    c.DescribeAllEnumsAsStrings();
+                    c.DescribeStringEnumsInCamelCase();
+                });
+            }
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(MyAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.WithOrigins("http://kinexplorer.com",
+                            "http://kinexplorer.io");
+                    });
+            });
+
+            Server server = new Server(Configuration["Horizon_Url"]);
+            Network.UsePublicNetwork();
+            Network.Use(new Network(Configuration["HorizonNetwork_Id"]));
+
+
+            services.AddSingleton(server);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,6 +65,19 @@ namespace KinExplorerCreateAccount
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            if (bool.TryParse(Configuration["Swagger_Enabled"], out var ret) && ret)
+            {
+                app.UseStaticFiles();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "KinExplorer Create Account API");
+
+                });
+
+            }
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseHttpsRedirection();
             app.UseMvc();
