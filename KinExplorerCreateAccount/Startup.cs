@@ -41,7 +41,8 @@ namespace KinExplorerCreateAccount
                     builder =>
                     {
                         builder.WithOrigins("http://kinexplorer.com",
-                            "http://kinexplorer.io");
+                            "http://kinexplorer.io","https://kinexplorer.com",
+                        "https://kinexplorer.io");
                     });
             });
 
@@ -79,7 +80,7 @@ namespace KinExplorerCreateAccount
             }
             app.UseCors(MyAllowSpecificOrigins);
 
-            app.UseHttpsRedirection();
+           // app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
