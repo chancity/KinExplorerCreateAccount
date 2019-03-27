@@ -29,7 +29,7 @@ namespace KinExplorerCreateAccount
             {
                 services.AddSwaggerGen(c =>
                 {
-                    c.SwaggerDoc("v1", new Info {Title = "KinExplorer Create Account API", Version = "v1"});
+                    c.SwaggerDoc("v1", new Info {Title = "KinExplorer Friendbot API", Version = "v1"});
                     c.DescribeAllEnumsAsStrings();
                     c.DescribeStringEnumsInCamelCase();
                 });
@@ -72,7 +72,7 @@ namespace KinExplorerCreateAccount
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "KinExplorer Create Account API");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "KinExplorer Friendbot API");
 
                 });
 
